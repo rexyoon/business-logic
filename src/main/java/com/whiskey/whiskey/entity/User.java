@@ -3,18 +3,21 @@ package com.whiskey.whiskey.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 사용자 엔티티
  * - 회원가입, 로그인 정보
- * - 사용자의 추천 이력 저장
+ * - 사용자의 추천, 리뷰, 선호도 정보 관리
  */
 @Entity
 @Table(name = "users", indexes = {
-        @Index(name = "idx_user_email", columnList = "email", unique = true),
-        @Index(name = "idx_user_username", columnList = "username", unique = true)
+        @Index(name = "idx_user_email", columnList = "email"),
+        @Index(name = "idx_user_username", columnList = "username"),
+        @Index(name = "idx_user_active", columnList = "is_active")
 })
 @Getter
 @Setter
@@ -54,6 +57,28 @@ public class User extends BaseEntity {
     private String profileImageUrl;
 
     /**
+     * 경험 수준
+     * BEGINNER: 초급자, INTERMEDIATE: 중급자, EXPERT: 전문가
+     */
+    @Column(length = 20)
+    @Builder.Default
+    private String experienceLevel = "BEGINNER";
+
+    /**
+     * 예산 최소값 (USD)
+     */
+    @Column
+    @Builder.Default
+    private Integer budgetMin = 30;
+
+    /**
+     * 예산 최대값 (USD)
+     */
+    @Column
+    @Builder.Default
+    private Integer budgetMax = 500;
+
+    /**
      * 계정 활성화 여부
      */
     @Column(nullable = false)
@@ -71,29 +96,53 @@ public class User extends BaseEntity {
     private String role = "ROLE_USER";
 
     /**
-     * 가입일 (생성일과 별도로 관리 가능)
+     * 이메일 인증 여부
      */
-    @Column(length = 50)
-    private String joinedDate;
+    @Column
+    @Builder.Default
+    private Boolean isEmailVerified = false;
 
     /**
-     * 사용자의 추천 이력
-     * @OneToMany: 1명의 사용자가 여러 개의 추천 가능
+     * 마지막 로그인 시간
      */
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Column
+    private LocalDateTime lastLoginAt;
+
+    /**
+     * 사용자의 맛 프로필 (1:1 관계)
+     */
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private TasteProfile tasteProfile;
+
+    /**
+     * 사용자의 추천 이력 (1:N 관계)
+     */
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Recommendation> recommendations = new ArrayList<>();
 
     /**
-     * 사용자의 리뷰
+     * 사용자의 리뷰 (1:N 관계)
      */
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Review> reviews = new ArrayList<>();
 
     /**
-     * 사용자의 맛 프로필
+     * 사용자의 구매 이력 (1:N 관계)
      */
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private TasteProfile tasteProfile;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Order> orders = new ArrayList<>();
+
+    /**
+     * 사용자의 활동 로그 (1:N 관계)
+     */
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<UserActivityLog> activityLogs = new ArrayList<>();
+
+    /**
+     * 사용자의 위스키 이력 (1:N 관계)
+     */
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<UserWhiskeyHistory> whiskeyHistory = new ArrayList<>();
 
     @Override
     public String toString() {
@@ -104,6 +153,7 @@ public class User extends BaseEntity {
                 ", fullName='" + fullName + '\'' +
                 ", role='" + role + '\'' +
                 ", isActive=" + isActive +
+                ", experienceLevel='" + experienceLevel + '\'' +
                 ", createdAt=" + getCreatedAt() +
                 '}';
     }

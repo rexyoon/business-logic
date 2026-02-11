@@ -11,7 +11,9 @@ import java.math.BigDecimal;
  * - AI 추천 모델에서 사용하는 벡터 저장
  */
 @Entity
-@Table(name = "taste_profiles")
+@Table(name = "taste_profiles", indexes = {
+        @Index(name = "idx_taste_profile_user", columnList = "user_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,7 +23,6 @@ public class TasteProfile extends BaseEntity {
 
     /**
      * 사용자 (1:1 관계)
-     * @OneToOne: 1명의 사용자는 1개의 맛 프로필만 가능
      */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
@@ -29,7 +30,6 @@ public class TasteProfile extends BaseEntity {
 
     /**
      * Peaty (피트맛) 선호도 (0-100)
-     * 스모키한 맛을 선호하는 정도
      */
     @Column
     @Builder.Default
@@ -37,7 +37,6 @@ public class TasteProfile extends BaseEntity {
 
     /**
      * Sweet (단맛) 선호도 (0-100)
-     * 달콤한 맛을 선호하는 정도
      */
     @Column
     @Builder.Default
@@ -45,7 +44,6 @@ public class TasteProfile extends BaseEntity {
 
     /**
      * Spicy (스파이시) 선호도 (0-100)
-     * 따뜻하고 매운 맛을 선호하는 정도
      */
     @Column
     @Builder.Default
@@ -53,7 +51,6 @@ public class TasteProfile extends BaseEntity {
 
     /**
      * Fruity (과일) 선호도 (0-100)
-     * 과일 향을 선호하는 정도
      */
     @Column
     @Builder.Default
@@ -61,7 +58,6 @@ public class TasteProfile extends BaseEntity {
 
     /**
      * Floral (꽃향) 선호도 (0-100)
-     * 꽃향을 선호하는 정도
      */
     @Column
     @Builder.Default
@@ -69,7 +65,6 @@ public class TasteProfile extends BaseEntity {
 
     /**
      * Woody (목재향) 선호도 (0-100)
-     * 오크 등의 목재향을 선호하는 정도
      */
     @Column
     @Builder.Default
@@ -77,7 +72,6 @@ public class TasteProfile extends BaseEntity {
 
     /**
      * Smoky (연기) 선호도 (0-100)
-     * 연기 향을 선호하는 정도
      */
     @Column
     @Builder.Default
@@ -85,7 +79,6 @@ public class TasteProfile extends BaseEntity {
 
     /**
      * Vanilla (바닐라) 선호도 (0-100)
-     * 바닐라 향을 선호하는 정도
      */
     @Column
     @Builder.Default
@@ -93,27 +86,25 @@ public class TasteProfile extends BaseEntity {
 
     /**
      * 선호하는 도수 (ABV)
-     * 예: 40, 46, 55 등
      */
     @Column
     private Integer preferredAbv;
 
     /**
      * 선호하는 가격대 (USD)
-     * 예: 50, 100, 200 등
      */
     @Column(precision = 10, scale = 2)
     private BigDecimal preferredPriceRange;
 
     /**
-     * 선호하는 지역
+     * 선호하는 지역 (쉼표 구분)
      * 예: "Speyside,Islay,Highland"
      */
     @Column(columnDefinition = "TEXT")
     private String preferredRegions;
 
     /**
-     * 피해야 할 맛 (알레르기 등)
+     * 피해야 할 맛 (쉼표 구분)
      * 예: "Peat,Smoke"
      */
     @Column(columnDefinition = "TEXT")
@@ -121,7 +112,6 @@ public class TasteProfile extends BaseEntity {
 
     /**
      * 프로필 업데이트된 횟수
-     * 얼마나 최신 데이터인지 판단
      */
     @Column
     @Builder.Default
@@ -134,7 +124,7 @@ public class TasteProfile extends BaseEntity {
     private String lastAnalyzedDate;
 
     /**
-     * AI 벡터 (선택사항: 고급 ML 모델 사용 시)
+     * AI 벡터 (고급 ML 모델 사용 시)
      * JSON 형식으로 저장
      */
     @Column(columnDefinition = "LONGTEXT")
@@ -158,7 +148,6 @@ public class TasteProfile extends BaseEntity {
                 ", spicyPreference=" + spicyPreference +
                 ", fruityPreference=" + fruityPreference +
                 ", preferredAbv=" + preferredAbv +
-                ", updateCount=" + updateCount +
                 ", confidenceScore=" + confidenceScore +
                 ", createdAt=" + getCreatedAt() +
                 '}';

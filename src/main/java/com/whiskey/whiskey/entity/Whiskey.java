@@ -13,10 +13,13 @@ import java.util.List;
  * - 이름, 산지, 도수, 가격 등의 정보 포함
  */
 @Entity
-@Table(name = "whiskeys", indexes = {
+@Table(name = "whiskies", indexes = {
+        @Index(name = "idx_whiskey_name", columnList = "name"),
         @Index(name = "idx_whiskey_region", columnList = "region"),
         @Index(name = "idx_whiskey_country", columnList = "country"),
-        @Index(name = "idx_whiskey_name", columnList = "name")
+        @Index(name = "idx_whiskey_category", columnList = "category"),
+        @Index(name = "idx_whiskey_price", columnList = "price"),
+        @Index(name = "idx_whiskey_in_stock", columnList = "in_stock")
 })
 @Getter
 @Setter
@@ -26,10 +29,17 @@ import java.util.List;
 public class Whiskey extends BaseEntity {
 
     /**
-     * 위스키 이름 (필수)
+     * 위스키 이름 (필수, 유니크)
      */
-    @Column(nullable = false, length = 150)
+    @Column(nullable = false, length = 150, unique = true)
     private String name;
+
+    /**
+     * 카테고리
+     * SCOTCH, BOURBON, IRISH, JAPANESE, CANADIAN, RYE, OTHER
+     */
+    @Column(nullable = false, length = 30)
+    private String category;
 
     /**
      * 제조 지역 (예: Speyside, Islay, Highland 등)
@@ -88,7 +98,7 @@ public class Whiskey extends BaseEntity {
 
     /**
      * 맛 프로필 (예: Peaty, Sweet, Spicy, Fruity 등)
-     * 쉼표로 구분된 문자열
+     * 쉼표로 구분된 문자열 (레거시 호환성)
      */
     @Column(columnDefinition = "TEXT")
     private String flavorProfile;
@@ -121,23 +131,49 @@ public class Whiskey extends BaseEntity {
     private Boolean inStock = true;
 
     /**
-     * 이 위스키에 대한 추천 이력
-     * @OneToMany: 1개의 위스키가 여러 개의 추천 가능
+     * 인기도 점수 (0.0 ~ 1.0)
+     * 추천 빈도 등으로 계산
      */
-    @OneToMany(mappedBy = "whiskey", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Column(precision = 3, scale = 2)
+    @Builder.Default
+    private BigDecimal popularityScore = BigDecimal.ZERO;
+
+    /**
+     * 위스키 맛 속성 (1:1 관계, 정규화)
+     */
+    @OneToOne(mappedBy = "whiskey", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private WhiskeyFlavorAttribute flavorAttribute;
+
+    /**
+     * 이 위스키에 대한 추천 이력 (1:N 관계)
+     */
+    @OneToMany(mappedBy = "whiskey", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Recommendation> recommendations = new ArrayList<>();
 
     /**
-     * 이 위스키에 대한 리뷰
+     * 이 위스키에 대한 리뷰 (1:N 관계)
      */
-    @OneToMany(mappedBy = "whiskey", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "whiskey", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Review> reviews = new ArrayList<>();
+
+    /**
+     * 이 위스키의 구매 기록 (1:N 관계)
+     */
+    @OneToMany(mappedBy = "whiskey", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Order> orders = new ArrayList<>();
+
+    /**
+     * 사용자가 이 위스키를 본 이력 (1:N 관계)
+     */
+    @OneToMany(mappedBy = "whiskey", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<UserWhiskeyHistory> userHistories = new ArrayList<>();
 
     @Override
     public String toString() {
         return "Whiskey{" +
                 "id=" + getId() +
                 ", name='" + name + '\'' +
+                ", category='" + category + '\'' +
                 ", region='" + region + '\'' +
                 ", country='" + country + '\'' +
                 ", abv=" + abv +
