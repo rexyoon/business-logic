@@ -1,13 +1,14 @@
 package com.whiskey.whiskey.repository;
 
 import com.whiskey.whiskey.entity.Whiskey;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface WhiskeyRepository {
+public interface WhiskeyRepository extends JpaRepository<Whiskey, Long> {
 
     /**
      * 특정 지역 위스키 검색

@@ -52,22 +52,22 @@ public class WhiskeyService {
         return whiskeyRepository.findByName(name);
     }
 
-//    /**
-//     * 위스키 저장
-//     *
-//     * @param whiskey 위스키 정보
-//     * @return Whiskey
-//     */
-//    public Whiskey saveWhiskey(Whiskey whiskey) {
-//        return whiskeyRepository.save(whiskey);
-//    }
-//
-//    /**
-//     * 위스키 삭제
-//     *
-//     * @param whiskeyId 위스키 ID
-//     */
-//    public void deleteWhiskey(Long whiskeyId) {
-//        whiskeyRepository.deleteById(whiskeyId);
-//    }
+    /**
+     * 위스키 저장
+     *
+     * @param whiskey 위스키 정보
+     * @return Whiskey
+     */
+    public Whiskey saveWhiskey(Whiskey whiskey) {
+        return whiskeyRepository.save(whiskey);
+    }
+
+    /**
+     * 위스키 삭제
+     *
+     * @param whiskeyId 위스키 ID
+     */
+    public void deleteWhiskey(Long whiskeyId) {
+        whiskeyRepository.deleteById(whiskeyId);
+    }
 }

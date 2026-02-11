@@ -40,24 +40,24 @@ public class RecommendationService {
     public List<Recommendation> findByWhiskeyId(Long whiskeyId) {
         return recommendationRepository.findByWhiskeyId(whiskeyId);
     }
-//
-//    /**
-//     * 추천 저장
-//     *
-//     * @param recommendation 추천 정보
-//     * @return Recommendation
-//     */
-//    public Recommendation saveRecommendation(Recommendation recommendation) {
-//        return recommendationRepository.save(recommendation);
-//    }
-//
-//    /**
-//     * 추천 삭제
-//     *
-//     * @param recommendationId 추천 ID
-//     */
-//    public void deleteRecommendation(Long recommendationId) {
-//        recommendationRepository.deleteById(recommendationId);
-//    }
+
+    /**
+     * 추천 저장
+     *
+     * @param recommendation 추천 정보
+     * @return Recommendation
+     */
+    public Recommendation saveRecommendation(Recommendation recommendation) {
+        return recommendationRepository.save(recommendation);
+    }
+
+    /**
+     * 추천 삭제
+     *
+     * @param recommendationId 추천 ID
+     */
+    public void deleteRecommendation(Long recommendationId) {
+        recommendationRepository.deleteById(recommendationId);
+    }
 }
 

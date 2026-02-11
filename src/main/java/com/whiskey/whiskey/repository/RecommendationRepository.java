@@ -1,12 +1,13 @@
 package com.whiskey.whiskey.repository;
 
 import com.whiskey.whiskey.entity.Recommendation;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface RecommendationRepository {
+public interface RecommendationRepository extends JpaRepository<Recommendation, Long> {
 
     /**
      *
